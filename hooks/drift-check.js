@@ -3,7 +3,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const STATE_FILE = path.join(__dirname, '..', 'session-state.md');
+const CONFIG_FILE = path.join(__dirname, '..', 'config.json');
+const config = fs.existsSync(CONFIG_FILE) ? JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')) : {};
+const STATE_FILE = config.state_file || path.join(__dirname, '..', 'session-state.md');
+const BRAIN_PATH = config.brain_path || null;
+const CLASSIFICATION_PROMPT = config.classification_prompt || null;
 
 function readState(content) {
   const state = {};
@@ -48,6 +52,10 @@ try {
 
   writeState(state);
 
+  const classificationPrompt = CLASSIFICATION_PROMPT && fs.existsSync(CLASSIFICATION_PROMPT)
+    ? '\n\nCLASSIFICATION PROMPT — active:\n' + fs.readFileSync(CLASSIFICATION_PROMPT, 'utf8')
+    : '';
+
   const context = [
     'DRIFT CHECK — run before responding:',
     `Current topic: ${state.current_topic}`,
@@ -60,6 +68,7 @@ try {
     '3. Has the topic clearly shifted? → drift confirmed. Notify: "This is moving toward [topic]. New session?" Then update session-state.md.',
     '',
     `Eviction pointer if drift confirmed: ${state.session_id}:${state.topic_start_index}:${state.current_message_index}`,
+    classificationPrompt,
   ].join('\n');
 
   const output = {

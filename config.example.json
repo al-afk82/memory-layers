@@ -1,0 +1,6 @@
+{
+  "echosystem_path": "/your/path/to/alecs-echosystem",
+  "brain_path": "/your/path/to/alecs-echosystem/brain/layers/memory-layers",
+  "state_file": "/your/path/to/memory-layers/session-state.md",
+  "classification_prompt": "/your/path/to/alecs-echosystem/brain/layers/memory-layers/layer2-classification-prompt.md"
+}
